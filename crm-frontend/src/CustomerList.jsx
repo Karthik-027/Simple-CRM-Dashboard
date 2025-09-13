@@ -69,7 +69,7 @@ export default function CustomersList() {
       <h2 style={{ fontWeight: "600", color: "#555" }}>Customer Management</h2>
 
       {/* Analytics Button */}
-      <div style={{ margin: "15px 0" }}>
+      {/* <div style={{ margin: "15px 0" }}>
         <button
           onClick={() => navigate("/analytics")}
           style={{
@@ -83,7 +83,7 @@ export default function CustomersList() {
         >
           📊 View Analytics
         </button>
-      </div>
+      </div> */}
 
       {/* Form */}
       <form

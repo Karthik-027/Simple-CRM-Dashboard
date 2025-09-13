@@ -37,5 +37,30 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         return ResponseEntity.ok(new AuthResponse(token, user.getName(), user.getRole().name()));
     }
+
+    @PostMapping("/register")
+public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest req) {
+    // check if user already exists
+    if (userRepo.findByEmail(req.getEmail()).isPresent()) {
+        return ResponseEntity.status(400).body(null);
+    }
+
+    // create new user
+    var user = com.skcet.simplecrmdashboard.model.User.builder()
+            .email(req.getEmail())
+            .passwordHash(passwordEncoder.encode(req.getPassword()))
+            .role(com.skcet.simplecrmdashboard.model.User.Role.valueOf(
+                    req.getRole() != null ? req.getRole() : "SALES_REP"))
+            .name(req.getName())
+            .build();
+
+    userRepo.save(user);
+
+    // generate token
+    String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+
+    return ResponseEntity.ok(new AuthResponse(token, user.getName(), user.getRole().name()));
+}
+
     
 }

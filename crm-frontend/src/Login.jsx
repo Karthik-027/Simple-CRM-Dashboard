@@ -4,8 +4,8 @@ import { AuthContext } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("admin@example.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const [err, setErr] = useState(null);
   const navigate = useNavigate();
@@ -15,16 +15,41 @@ export default function Login() {
     try {
       const res = await api("/auth/login", "POST", null, { email, password });
       login({ token: res.token, name: res.name, role: res.role });
-      navigate("/customers"); // redirect after login
+
+      // Redirect based on role
+      switch (res.role) {
+        case "ADMIN":
+          navigate("/admin-dashboard");
+          break;
+        case "SALES_REP":
+          navigate("/customers");
+          break;
+        case "ANALYST":
+          navigate("/analytics");
+          break;
+        default:
+          navigate("/");
+      }
     } catch (ex) {
       setErr(ex.message || "Login failed");
     }
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: "80px auto", padding: 20, border: "1px solid #ccc", borderRadius: 8 }}>
+    <div
+      style={{
+        maxWidth: 400,
+        margin: "80px auto",
+        padding: 20,
+        border: "1px solid #ccc",
+        borderRadius: 8,
+      }}
+    >
       <h2 style={{ textAlign: "center" }}>Login</h2>
-      <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      <form
+        onSubmit={submit}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -55,7 +80,28 @@ export default function Login() {
           Sign In
         </button>
       </form>
-      {err && <div style={{ color: "red", marginTop: 10, textAlign: "center" }}>{err}</div>}
+      
+      {err && (
+        <div style={{ color: "red", marginTop: 10, textAlign: "center" }}>
+          {err}
+        </div>
+      )}
+      
+      <p style={{ textAlign: "center", marginTop: 20 }}>
+        Don't have an account?{" "}
+        <button 
+          onClick={() => navigate("/register")}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#1976d2",
+            textDecoration: "underline",
+            cursor: "pointer",
+          }}
+        >
+          Create Account
+        </button>
+      </p>
     </div>
   );
 }
