@@ -28,8 +28,9 @@ public class CustomerService {
 
     public void deleteCustomer(Long id){
         if(!repository.existsById(id)){
-            throw new ResourceNotFoundException("Customer not found with id"+id);
+            throw new ResourceNotFoundException("Customer not found with id: "+id);
         }
+        repository.deleteById(id);
     }
 
     public Customer updateCustomer(Long id, Customer updatedCustomer) {
@@ -39,6 +40,6 @@ public class CustomerService {
             customer.setPhone(updatedCustomer.getPhone());
             customer.setCompany(updatedCustomer.getCompany());
             return repository.save(customer);
-        }).orElseThrow(()-> new ResourceNotFoundException("Customer not found with id"+id));
+        }).orElseThrow(()-> new ResourceNotFoundException("Customer not found with id: "+id));
     }
 }

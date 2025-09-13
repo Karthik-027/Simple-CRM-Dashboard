@@ -1,0 +1,244 @@
+import React, { useContext, useEffect, useState } from "react";
+import { api } from "./api";
+import { AuthContext } from "./AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+
+export default function CustomersList() {
+  const { token } = useContext(AuthContext);
+  const [customers, setCustomers] = useState([]);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
+  const [editingId, setEditingId] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadCustomers();
+  }, [token]);
+
+  async function loadCustomers() {
+    try {
+      const res = await api("/customers", "GET", token);
+      setCustomers(res || []);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function saveCustomer(e) {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        // update
+        const updated = await api(`/customers/${editingId}`, "PUT", token, form);
+        setCustomers((prev) =>
+          prev.map((c) => (c.id === editingId ? updated : c))
+        );
+        setEditingId(null);
+      } else {
+        // add new
+        const created = await api("/customers", "POST", token, form);
+        setCustomers((prev) => [...prev, created]);
+      }
+      setForm({ name: "", email: "", phone: "", company: "" });
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  }
+
+  async function deleteCustomer(id) {
+    try {
+      await api(`/customers/${id}`, "DELETE", token);
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function startEdit(customer) {
+    setForm({
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      company: customer.company,
+    });
+    setEditingId(customer.id);
+  }
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2 style={{ fontWeight: "600", color: "#555" }}>Customer Management</h2>
+
+      {/* Analytics Button */}
+      <div style={{ margin: "15px 0" }}>
+        <button
+          onClick={() => navigate("/analytics")}
+          style={{
+            background: "#2e7d32",
+            color: "white",
+            border: "none",
+            padding: "8px 14px",
+            cursor: "pointer",
+            borderRadius: "4px",
+          }}
+        >
+          📊 View Analytics
+        </button>
+      </div>
+
+      {/* Form */}
+      <form
+        onSubmit={saveCustomer}
+        style={{
+          display: "flex",
+          gap: "10px",
+          margin: "20px 0",
+        }}
+      >
+        <input
+          placeholder="Name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+        />
+        <input
+          placeholder="Email"
+          type="email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
+        <input
+          placeholder="Phone"
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+        />
+        <input
+          placeholder="Company"
+          value={form.company}
+          onChange={(e) => setForm({ ...form, company: e.target.value })}
+        />
+        <button
+          type="submit"
+          style={{
+            background: "#1976d2",
+            color: "white",
+            border: "none",
+            padding: "8px 14px",
+            cursor: "pointer",
+            borderRadius: "4px",
+          }}
+        >
+          {editingId ? "Update Customer" : "Add Customer"}
+        </button>
+        {editingId && (
+          <button
+            type="button"
+            onClick={() => {
+              setForm({ name: "", email: "", phone: "", company: "" });
+              setEditingId(null);
+            }}
+            style={{
+              background: "gray",
+              color: "white",
+              border: "none",
+              padding: "8px 14px",
+              cursor: "pointer",
+              borderRadius: "4px",
+            }}
+          >
+            Cancel
+          </button>
+        )}
+      </form>
+
+      {/* Table */}
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          background: "white",
+        }}
+      >
+        <thead style={{ background: "#f5f5f5" }}>
+          <tr>
+            <th style={{ padding: "10px", textAlign: "left" }}>Name</th>
+            <th style={{ padding: "10px", textAlign: "left" }}>Email</th>
+            <th style={{ padding: "10px", textAlign: "left" }}>Phone</th>
+            <th style={{ padding: "10px", textAlign: "left" }}>Company</th>
+            <th style={{ padding: "10px", textAlign: "left" }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customers.map((c) => (
+            <tr key={c.id} style={{ borderBottom: "1px solid #ddd" }}>
+              <td style={{ padding: "10px" }}>
+                <Link
+                  to={`/customers/${c.id}`}
+                  style={{ color: "#1976d2", textDecoration: "none" }}
+                >
+                  {c.name}
+                </Link>
+              </td>
+              <td style={{ padding: "10px" }}>{c.email}</td>
+              <td style={{ padding: "10px" }}>{c.phone}</td>
+              <td style={{ padding: "10px" }}>{c.company}</td>
+              <td style={{ padding: "10px", display: "flex", gap: "8px" }}>
+                <button
+                  onClick={() => startEdit(c)}
+                  style={{
+                    background: "orange",
+                    color: "white",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteCustomer(c.id)}
+                  style={{
+                    background: "red",
+                    color: "white",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Delete
+                </button>
+                <button
+                  onClick={() => navigate(`/customers/${c.id}/interactions`)}
+                  style={{
+                    background: "#6a1b9a",
+                    color: "white",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  View Interactions
+                </button>
+              </td>
+            </tr>
+          ))}
+          {customers.length === 0 && (
+            <tr>
+              <td
+                colSpan="5"
+                style={{
+                  textAlign: "center",
+                  padding: "20px",
+                  color: "#777",
+                }}
+              >
+                No customers yet.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
