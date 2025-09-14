@@ -9,7 +9,17 @@ export default function CustomerDetail() {
   const [customer, setCustomer] = useState(null);
   const [interactions, setInteractions] = useState([]);
   const [note, setNote] = useState("");
+  const [type, setType] = useState("CALL");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  // Interaction types
+  const interactionTypes = [
+    { value: "CALL", label: "Call" },
+    { value: "EMAIL", label: "Email" },
+    { value: "MEETING", label: "Meeting" },
+    { value: "TICKET", label: "Ticket" },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -17,21 +27,32 @@ export default function CustomerDetail() {
         setCustomer(await api(`/customers/${id}`, "GET", token));
         setInteractions(await api(`/customers/${id}/interactions`, "GET", token));
       } catch (e) {
+        setError("Failed to load customer details. Please try again.");
         console.error(e);
       }
     })();
   }, [id, token]);
 
   async function save() {
+    setError(null);
+
+    // Validate input
+    if (!note.trim()) {
+      setError("Please enter interaction notes.");
+      return;
+    }
+
     try {
       const res = await api(`/customers/${id}/interactions`, "POST", token, {
-        type: "CALL",
+        type,
         notes: note,
       });
       setInteractions((prev) => [res, ...prev]);
       setNote("");
-    } catch (e) {
-      console.error(e);
+      setType("CALL");
+    } catch (err) {
+      setError(`Failed to save interaction: ${err.message}`);
+      console.error(err);
     }
   }
 
@@ -54,6 +75,19 @@ export default function CustomerDetail() {
         ← Back
       </button>
 
+      {/* Error Display */}
+      {error && (
+        <div style={{
+          color: "#d32f2f",
+          backgroundColor: "#ffebee",
+          padding: "10px",
+          borderRadius: "4px",
+          marginBottom: "15px",
+        }}>
+          {error}
+        </div>
+      )}
+
       <h2>{customer.name}</h2>
       <p>
         <strong>Email:</strong> {customer.email} <br />
@@ -63,6 +97,24 @@ export default function CustomerDetail() {
 
       <div style={{ marginTop: "20px" }}>
         <h3>Log Interaction</h3>
+        <div style={{ marginBottom: "10px" }}>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            style={{
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              marginRight: "10px",
+            }}
+          >
+            {interactionTypes.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}

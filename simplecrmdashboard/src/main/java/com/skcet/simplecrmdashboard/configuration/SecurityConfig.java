@@ -1,6 +1,7 @@
 package com.skcet.simplecrmdashboard.configuration;
 
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -13,10 +14,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-
     private final JwtFilter jwtFilter;
 
-    public SecurityConfig(JwtFilter jwtFilter) { this.jwtFilter = jwtFilter; }
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -25,13 +27,15 @@ public class SecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeHttpRequests()
                .requestMatchers("/api/auth/**").permitAll()
+               .requestMatchers("/api/users/**").hasRole("ADMIN") // Restrict user management to ADMINs
                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                .anyRequest().authenticated();
-
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(10); }
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(10);
+    }
 }

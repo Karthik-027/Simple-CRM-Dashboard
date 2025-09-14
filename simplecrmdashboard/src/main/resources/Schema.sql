@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS interactions (
   type VARCHAR(20) NOT NULL,
   notes TEXT,
   timestamp DATETIME,
-  FOREIGN KEY (customer_id) REFERENCES customers(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- orders
@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_id BIGINT,
   order_date DATETIME,
   amount DECIMAL(10,2),
-  status VARCHAR(20)
+  status VARCHAR(20),
+  FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL
 );
 
 -- notifications
@@ -48,5 +49,18 @@ CREATE TABLE IF NOT EXISTS notifications (
   user_id BIGINT,
   message VARCHAR(255),
   is_read BOOLEAN,
-  created_at DATETIME
+  created_at DATETIME,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- log_activities
+CREATE TABLE IF NOT EXISTS log_activities (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    entity_type VARCHAR(50) NOT NULL,
+    entity_id BIGINT,
+    details TEXT,
+    timestamp DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

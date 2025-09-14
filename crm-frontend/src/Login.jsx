@@ -17,10 +17,23 @@ export default function Login() {
     setLoading(true);
     setErr(null);
 
+    // Validate inputs
+    if (!email.trim()) {
+      setErr("Email is required.");
+      setLoading(false);
+      return;
+    }
+    if (!password.trim()) {
+      setErr("Password is required.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await api("/auth/login", "POST", null, { email, password });
       login({ token: res.token, name: res.name, role: res.role });
 
+      // Redirect based on role
       switch (res.role) {
         case "ADMIN":
           navigate("/admin-dashboard");
@@ -35,7 +48,18 @@ export default function Login() {
           navigate("/");
       }
     } catch (ex) {
-      setErr(ex.message || "Login failed. Please check your credentials.");
+      // Set user-friendly error messages
+      if (ex.message.includes("401") || ex.message.includes("Unauthorized")) {
+        setErr("Incorrect email or password. Please try again.");
+      } else if (ex.message.includes("email")) {
+        setErr("Invalid email address.");
+      } else if (ex.message.includes("password")) {
+        setErr("Incorrect password.");
+      } else if (ex.message.includes("400")) {
+        setErr("Invalid input. Please check your credentials.");
+      } else {
+        setErr(ex.message || "Login failed. Please check your credentials.");
+      }
     } finally {
       setLoading(false);
     }
@@ -46,7 +70,6 @@ export default function Login() {
       <div className="auth-card">
         <h2 className="auth-title">Welcome Back</h2>
         <p className="auth-subtitle">Sign in to your CRM account</p>
-
         <form onSubmit={submit} className="auth-form">
           <div className="form-group">
             <label>Email Address</label>
@@ -59,7 +82,6 @@ export default function Login() {
               disabled={loading}
             />
           </div>
-
           <div className="form-group">
             <label>Password</label>
             <input
@@ -71,17 +93,14 @@ export default function Login() {
               disabled={loading}
             />
           </div>
-
           {err && <div className="error-message">⚠️ {err}</div>}
-
           <button type="submit" disabled={loading} className="auth-button primary">
             {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-
         <div className="auth-footer">
           <p>
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <button onClick={() => navigate("/register")} className="link-button">
               Create Account
             </button>
