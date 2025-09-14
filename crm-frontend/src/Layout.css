@@ -1,0 +1,134 @@
+/* Layout.css */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7f9;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 250px;
+  background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
+  color: white;
+  padding: 20px 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 20px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.sidebar-header p {
+  margin: 5px 0 0;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin: 5px 0;
+}
+
+.sidebar-menu a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.sidebar-menu a:hover {
+  background: rgba(255,255,255,0.1);
+  border-left-color: #e74c3c;
+}
+
+.sidebar-menu a.active {
+  background: rgba(255,255,255,0.15);
+  border-left-color: #e74c3c;
+}
+
+.sidebar-icon {
+  margin-right: 12px;
+  font-size: 1.2rem;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  padding: 0;
+}
+
+.content-header {
+  background: white;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e1e8ed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.content-body {
+  padding: 30px;
+}
+
+/* Card Components */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 20px;
+  border-bottom: 1px solid #e1e8ed;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 70px;
+  }
+  
+  .sidebar-header, .sidebar-menu span {
+    display: none;
+  }
+  
+  .sidebar-menu a {
+    justify-content: center;
+    padding: 15px;
+  }
+  
+  .sidebar-icon {
+    margin-right: 0;
+    font-size: 1.5rem;
+  }
+  
+  .main-content {
+    margin-left: 70px;
+  }
+}

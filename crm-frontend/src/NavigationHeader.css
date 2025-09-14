@@ -1,0 +1,73 @@
+.nav-header {
+  padding: 12px 24px;
+  background: #1e3a8a; /* dark blue */
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-welcome {
+  font-size: 0.9rem;
+  color: #dbeafe;
+  margin-top: 4px;
+}
+
+.nav-right {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-btn,
+.logout-btn,
+.register-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+/* Default nav buttons */
+.nav-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.nav-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* Register button */
+.register-btn {
+  background: #10b981;
+  color: white;
+}
+
+.register-btn:hover {
+  background: #059669;
+}
+
+/* Logout button */
+.logout-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
